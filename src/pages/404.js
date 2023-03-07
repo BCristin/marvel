@@ -1,6 +1,7 @@
 import ErrorMessage from "../components/errorMessage/ErrorMessage";
 import { Link } from "react-router-dom";
 const Page404 = () => {
+	console.log("Page404");
 	return (
 		<div>
 			<ErrorMessage />

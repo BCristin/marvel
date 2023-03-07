@@ -6,6 +6,8 @@ import ErrorBoundary from "../components/errorBoundary/ErrorBoundary";
 import { useState } from "react";
 
 const MainPage = () => {
+	console.log("MainPage");
+
 	const [selectedChar, setChar] = useState(null);
 	const onCharSelected = (id) => {
 		setChar(id);

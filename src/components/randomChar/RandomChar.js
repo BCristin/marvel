@@ -13,7 +13,7 @@ const RandomChar = () => {
 	const { loading, error, getCharacter, clearError } = useMarvelService();
 
 	useEffect(() => {
-		console.log("useEffect");
+		// console.log("useEffect");
 		updateChar();
 		const timerId = setInterval(updateChar, 6000000);
 		return () => {

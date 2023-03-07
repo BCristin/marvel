@@ -6,11 +6,10 @@ import { useEffect, useState } from "react";
 import useMarvelService from "../services/MarvelService";
 import ErrorMessage from "../components/errorMessage/ErrorMessage";
 import Spinner from "../components/spinner/Spinner";
-// import useMarvelService from "../../services/MarvelService";
-// import Spinner from "../spinner/Spinner";
-// import ErrorMessage from "../errorMessage/ErrorMessage";
 
 const SingleComicPage = () => {
+	console.log("SingleComicPage");
+
 	const { comicId } = useParams();
 	const [comic, setComic] = useState(null);
 
