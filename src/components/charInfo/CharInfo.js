@@ -1,64 +1,63 @@
 import "./charInfo.scss";
 import PropTypes from "prop-types";
-import { Component } from "react";
-import MarvelService from "../../services/MarvelService";
+import { useEffect, useState } from "react";
+import useMarvelService from "../../services/MarvelService";
 import Spinner from "../spinner/Spinner";
 import ErrorMessage from "../errorMessage/ErrorMessage";
 import Skeleton from "../skeleton/Skeleton";
+import { Link } from "react-router-dom";
 
-class CharInfo extends Component {
-	state = {
-		char: null,
-		loading: false,
-		error: false,
-	};
-	marvelService = new MarvelService();
+const CharInfo = (props) => {
+	const [char, setChar] = useState(null);
 
-	componentDidMount() {
-		this.updateChar();
-	}
-	componentDidUpdate(prevProps, prevState) {
-		// console.log("componentDidUpdate");
-		if (this.props.charID !== prevProps.charID) {
-			this.updateChar();
-		}
-	}
-	updateChar = () => {
-		const { charID } = this.props;
+	const { loading, error, getCharacter, clearError } = useMarvelService();
+	// useEffect(
+	// 	() => {
+	// 		updateChar();
+	// 		console.log("useEffect");
+	// 	}, // eslint-disable-next-line
+	// 	[]
+	// );
+
+	// componentDidUpdate(prevProps, prevState) {
+	// 	// console.log("componentDidUpdate");
+	// 	if (this.props.charID !== prevProps.charID) {
+	// 		this.updateChar();
+	// 	}
+	// }
+
+	useEffect(() => {
+		updateChar();
+		console.log("useEffect props.charID"); // eslint-disable-next-line
+	}, [props.charID]);
+
+	const updateChar = () => {
+		const { charID } = props;
 		if (!charID) {
 			return;
 		}
 		// this.loading.mao((item) => item); // eroare pt verificare
-		this.setState({ loading: true });
-
-		this.marvelService.getCharacter(charID).then(this.onCharLoaded).catch(this.onError);
+		clearError();
+		getCharacter(charID).then(onCharLoaded);
 	};
-	onCharLoaded = (char) => {
-		this.setState({ char, loading: false });
-	};
-
-	onError = () => {
-		this.setState({ loading: false, error: true });
+	const onCharLoaded = (char) => {
+		setChar(char);
 	};
 
-	render() {
-		const { char, loading, error } = this.state;
+	const skeleton = char || loading || error ? null : <Skeleton />;
+	const errorMessage = error ? <ErrorMessage /> : null;
+	const spinner = loading ? <Spinner /> : null;
+	const content = !(loading || error || !char) ? <View char={char} /> : null;
 
-		const skeleton = char || loading || error ? null : <Skeleton />;
-		const errorMessage = error ? <ErrorMessage /> : null;
-		const spinner = loading ? <Spinner /> : null;
-		const content = !(loading || error || !char) ? <View char={char} /> : null;
-
-		return (
-			<div className="char__info">
-				{skeleton}
-				{errorMessage}
-				{spinner}
-				{content}
-			</div>
-		);
-	}
-}
+	return (
+		<div className="char__info">
+			{skeleton}
+			{errorMessage}
+			{spinner}
+			{content}
+		</div>
+	);
+};
 
 const View = ({ char }) => {
 	const { name, description, thumbnail, homepage, wiki, comics } = char;
@@ -83,16 +82,17 @@ const View = ({ char }) => {
 			<div className="char__descr">{description}</div>
 			<div className="char__comics">Comics:</div>
 			<ul className="char__comics-list">
-				{comics.length > 0 ? null : "There is no comics with this character"}
-				{comics.map((item, i) => {
+				{comics[0].length > 0 ? null : "There is no comics with this character"}
+				{comics[0].map((item, i) => {
 					if (i > 10) {
 						// eslint-disable-next-line
 						return;
 					}
+
 					return (
-						<li className="char__comics-item" key={i}>
+						<Link to={`/comics/${item.id}`} className="char__comics-item" key={item.id}>
 							{item.name}
-						</li>
+						</Link>
 					);
 				})}
 			</ul>
