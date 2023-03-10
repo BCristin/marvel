@@ -8,16 +8,19 @@ import "./charSearchForm.scss";
 
 const CharSearchForm = () => {
 	const [char, setchar] = useState(null);
-	const { loading, getCharacterByName, clearError } = useMarvelService();
+	const { getCharacterByName, clearError, process, setProcess } = useMarvelService();
 
 	const updateChar = (nameSearchChar) => {
 		clearError();
 		getCharacterByName(nameSearchChar)
 			.then(setchar)
-			.catch(() => setchar("error"));
+			.then(() => setProcess("confirmed"))
+			.catch(() => {
+				setchar("error");
+				setProcess("waiting");
+			});
 	};
 
-	console.log(char);
 	const result = !char ? null : char === "error" ? (
 		<div className="char__search-error">
 			The character was not found. Check the name and try again
@@ -54,7 +57,11 @@ const CharSearchForm = () => {
 							onClick={() => setchar(null)}
 						/>
 
-						<button type="submit" className="button button__main" disabled={loading}>
+						<button
+							type="submit"
+							className="button button__main"
+							disabled={process === "loading"}
+						>
 							<div className="inner">find</div>
 						</button>
 					</div>

@@ -5,13 +5,28 @@ import Spinner from "../spinner/Spinner";
 import ErrorMessage from "../errorMessage/ErrorMessage";
 import { Link } from "react-router-dom";
 
+const setContent = (process, Component, newItemLoading) => {
+	switch (process) {
+		case "waiting":
+			return <Spinner />;
+		case "loading":
+			return newItemLoading ? <Component /> : <Spinner />;
+		case "confirmed":
+			return <Component />;
+		case "error":
+			return <ErrorMessage />;
+		default:
+			throw Error("Unexpected proces state");
+	}
+};
+
 const ComicsList = () => {
 	const [comicsList, setComicsList] = useState([]);
 	const [newItemLoading, setNewItemLoading] = useState(false);
 	const [offset, setOffset] = useState(1540);
 	const [comicsEnded, setComicsEnded] = useState(false);
 
-	const { loading, error, getAllComics } = useMarvelService();
+	const { getAllComics, process, setProcess } = useMarvelService();
 	useEffect(
 		() => {
 			onRequest(offset, true);
@@ -20,7 +35,9 @@ const ComicsList = () => {
 	);
 	const onRequest = (offset, initial) => {
 		initial ? setNewItemLoading(false) : setNewItemLoading(true);
-		getAllComics(offset).then(onComicsListLoaded);
+		getAllComics(offset)
+			.then(onComicsListLoaded)
+			.then(() => setProcess("confirmed"));
 	};
 	const onComicsListLoaded = (newComicsList) => {
 		let ended = false;
@@ -33,27 +50,26 @@ const ComicsList = () => {
 		setComicsEnded(ended);
 	};
 	function rederItems(arr) {
-		return arr.map((item) => {
-			const { title, id, price, thumbnail } = item;
-			return (
-				<li className="comics__item" key={id} tabIndex={0}>
-					<Link to={`/comics/${id}`}>
-						<img src={thumbnail} alt="name" className="comics__item-img" />
-						<div className="comics__item-name">{title}</div>
-						<div className="comics__item-price">{price}</div>
-					</Link>
-				</li>
-			);
-		});
+		return (
+			<ul className="comics__grid">
+				{arr.map((item) => {
+					const { title, id, price, thumbnail } = item;
+					return (
+						<li className="comics__item" key={id} tabIndex={0}>
+							<Link to={`/comics/${id}`}>
+								<img src={thumbnail} alt="name" className="comics__item-img" />
+								<div className="comics__item-name">{title}</div>
+								<div className="comics__item-price">{price}</div>
+							</Link>
+						</li>
+					);
+				})}
+			</ul>
+		);
 	}
-	const errorMessage = error ? <ErrorMessage /> : null;
-	const spinner = loading && !newItemLoading ? <Spinner /> : null;
-
 	return (
 		<div className="comics__list">
-			{errorMessage}
-			{spinner}
-			<ul className="comics__grid">{rederItems(comicsList)}</ul>
+			{setContent(process, () => rederItems(comicsList), newItemLoading)}
 			<button
 				className="button button__main button__long"
 				disabled={newItemLoading}

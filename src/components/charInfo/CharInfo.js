@@ -2,30 +2,14 @@ import "./charInfo.scss";
 import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
 import useMarvelService from "../../services/MarvelService";
-import Spinner from "../spinner/Spinner";
-import ErrorMessage from "../errorMessage/ErrorMessage";
-import Skeleton from "../skeleton/Skeleton";
+
 import { Link } from "react-router-dom";
+import setContent from "../../utils/setContent";
 
 const CharInfo = (props) => {
 	const [char, setChar] = useState(null);
 
-	const { loading, error, getCharacter, clearError } = useMarvelService();
-	// useEffect(
-	// 	() => {
-	// 		updateChar();
-	// 		console.log("useEffect");
-	// 	}, // eslint-disable-next-line
-	// 	[]
-	// );
-
-	// componentDidUpdate(prevProps, prevState) {
-	// 	// console.log("componentDidUpdate");
-	// 	if (this.props.charID !== prevProps.charID) {
-	// 		this.updateChar();
-	// 	}
-	// }
-
+	const { getCharacter, clearError, process, setProcess } = useMarvelService();
 	useEffect(() => {
 		updateChar();
 		// eslint-disable-next-line
@@ -38,29 +22,19 @@ const CharInfo = (props) => {
 		}
 		// this.loading.mao((item) => item); // eroare pt verificare
 		clearError();
-		getCharacter(charID).then(onCharLoaded);
+		getCharacter(charID)
+			.then(onCharLoaded)
+			.then(() => setProcess("confirmed"));
 	};
 	const onCharLoaded = (char) => {
 		setChar(char);
 	};
 
-	const skeleton = char || loading || error ? null : <Skeleton />;
-	const errorMessage = error ? <ErrorMessage /> : null;
-	const spinner = loading ? <Spinner /> : null;
-	const content = !(loading || error || !char) ? <View char={char} /> : null;
-
-	return (
-		<div className="char__info">
-			{skeleton}
-			{errorMessage}
-			{spinner}
-			{content}
-		</div>
-	);
+	return <div className="char__info">{setContent(process, View, char)}</div>;
 };
 
-const View = ({ char }) => {
-	const { name, description, thumbnail, homepage, wiki, comics } = char;
+const View = ({ data }) => {
+	const { name, description, thumbnail, homepage, wiki, comics } = data;
 	const style = thumbnail.indexOf("image_not_available") > 0 ? "contain" : "cover";
 
 	return (
