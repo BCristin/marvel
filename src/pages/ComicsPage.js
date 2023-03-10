@@ -1,11 +1,14 @@
+import { Helmet } from "react-helmet";
 import AppBanner from "../components/appBanner/AppBanner";
 import ComicsList from "../components/comicsList/ComicsList";
 
 const ComicsPage = () => {
-	console.log("ComicsPage");
-
 	return (
 		<>
+			<Helmet>
+				<meta name="description" content="Comics page" />
+				<title>Comics page</title>
+			</Helmet>
 			<AppBanner />
 			<ComicsList />
 		</>

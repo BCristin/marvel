@@ -6,6 +6,8 @@ import { useEffect, useState } from "react";
 import useMarvelService from "../services/MarvelService";
 import ErrorMessage from "../components/errorMessage/ErrorMessage";
 import Spinner from "../components/spinner/Spinner";
+import AppBanner from "../components/appBanner/AppBanner";
+import { Helmet } from "react-helmet";
 
 const SingleComicPage = () => {
 	console.log("SingleComicPage");
@@ -34,6 +36,7 @@ const SingleComicPage = () => {
 
 	return (
 		<>
+			<AppBanner />
 			{errorMessage}
 			{spinner}
 			{content}
@@ -45,6 +48,10 @@ const View = ({ comic }) => {
 	const { title, description, thumbnail, pageCount, language, price } = comic;
 	return (
 		<div className="single-comic">
+			<Helmet>
+				<meta name="description" content={`${title} comics book`}></meta>
+				<title>Comics {title}</title>
+			</Helmet>
 			<img src={thumbnail} alt={title} className="single-comic__img" />
 			<div className="single-comic__info">
 				<h2 className="single-comic__name">{title}</h2>
